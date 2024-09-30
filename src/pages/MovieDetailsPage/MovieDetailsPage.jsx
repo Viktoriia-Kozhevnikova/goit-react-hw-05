@@ -13,7 +13,7 @@ const MovieDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
-  const goBackRef = useRef(location.state ?? '/');
+  const goBackRef = useRef(location.state ?? '/movies');
 
   const linkClass = ({ isActive }) => {
     return clsx(s.link, isActive && s.active);
