@@ -1,4 +1,24 @@
 .container {
     display: flex;
-    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-end;
+    font-size: 25px;
+    gap: 30px;
+    padding: 20px 30px;
+    z-index: 1000;
+}
+.link {
+    text-decoration: none;
+    color: azure;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: rgb(139, 139, 139);
+    text-decoration: underline;
+}
+
+.active {
+    text-decoration: underline;
+    color: rgba(202, 0, 0, 0.829);
 }

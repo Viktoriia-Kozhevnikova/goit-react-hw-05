@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { fetchReviews } from "/src/services/api.jsx";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchReviews } from '/src/services/api.jsx';
 import toast from 'react-hot-toast';
-import Loader from '/src/components/Loader/Loader.jsx'
+import Loader from '/src/components/Loader/Loader.jsx';
+import s from '/src/components/MovieReviews/MovieReviews.module.css'
 
 const MovieReviews = () => {
   const { movieId } = useParams();
@@ -14,16 +15,12 @@ const MovieReviews = () => {
       setLoading(true);
       try {
         const data = await fetchReviews(movieId);
-        if (data && data.results) {
-          setReviews(data.results); 
-        } else {
-          setReviews([]); 
-        }
+        setReviews(data?.results || []); 
       } catch {
-        toast.error('An error occurred while retrieving feedback. Please try again.')
+        toast.error('An error occurred while retrieving feedback. Please try again.');
         setReviews([]);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
     getReviews();
@@ -32,16 +29,17 @@ const MovieReviews = () => {
   if (loading) {
     return <Loader />;
   }
+  
   return (
-    <div>
+    <div className={s.container}>
       {reviews.length === 0 ? (
         <p>No reviews.</p> 
       ) : (
-        <ul>
+        <ul className={s.list}>
           {reviews.map((review) => (
-            <li key={review.id}>
-              <h2>{review.author}</h2>
-              <p>{review.content}</p>
+            <li className={s.item} key={review.id}>
+              <h2 className={s.author}>{review.author}</h2>
+              <p className={s.content}>{review.content}</p>
             </li>
           ))}
         </ul>
@@ -50,4 +48,5 @@ const MovieReviews = () => {
   );
 };
 
-export default MovieReviews
+export default MovieReviews;
+

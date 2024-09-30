@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    padding: 20px;
+    text-align: left;
+    flex-direction: column;
+}
+
+.list {
+    padding: 0;
+    margin-left: 20px;
+}
+
+.link {
+    text-decoration: none;
+    color: azure;
+    padding: 10px;
+    font-size: 20px;
+}
+
+.link:hover {
+    color: rgba(202, 0, 0, 0.829);
+    text-decoration: underline;
+}
+
+.error {
+    margin-left: 40px;
+    margin-top: 30px;
+}

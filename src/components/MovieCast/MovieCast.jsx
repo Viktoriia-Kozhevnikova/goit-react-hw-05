@@ -1,69 +1,74 @@
-// import React from 'react'
-
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { fetchCast } from '/src/services/api.jsx'
-import { fetchConfig } from '/src/services/api.jsx'
-import Loader from '/src/components/Loader/Loader.jsx'
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchCast, fetchConfig } from '/src/services/api.jsx';
+import Loader from '/src/components/Loader/Loader.jsx';
+import toast from 'react-hot-toast'; 
+import s from '/src/components/MovieCast/MovieCast.module.css'
 
 const MovieCast = () => {
   const { movieId } = useParams();
-  const [actors, setActors] = useState({});
+  const [actors, setActors] = useState([]);
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
-    const getConfig = async () => {
-      setLoading(true);
-      const configuration = await fetchConfig();
-      setConfig(configuration);
-      setLoading(false);
-    }
-    getConfig();
-  }, [])
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const configuration = await fetchConfig();
+        setConfig(configuration);
 
-
-  useEffect(() => {
-    const getCast = async () => {
         const data = await fetchCast(movieId);
         setActors(data);
+      } catch {
+        setError('Failed to fetch data.'); 
+        toast.error('Failed to fetch data.');
+      } finally {
+        setLoading(false);
       }
-      getCast();
-  }, [movieId])
+    };
 
-  const actorImgUrlBase = config ? `${config.images.secure_base_url}/w200` : "";
+    fetchData();
+  }, [movieId]);
+
+  const actorImgUrlBase = config ? `${config.images.secure_base_url}/w200` : '';
 
   if (loading) {
     return <Loader />;
   }
 
+  if (error) {
+    return <div>{error}</div>;
+  } 
   return (
-  <div>
-    <ul>
-      {actors.length > 0 ? (
-          actors.map(actor => (
-              actor.known_for_department === 'Acting' && (
-                  <li key={actor.id}>
-                      <div>
-                          <img 
-                             src={`${actorImgUrlBase}${actor.profile_path}`} 
-                             alt={actor.name} 
-                          />
-                          <div>
-                              <h2>{actor.name}</h2>
-                              <p>{actor.character}</p>
-                          </div>
-                      </div>
-                      <hr />
-                  </li>
-              )
-          ))
-      ) : (
-        <li>No actors found.</li>
-      )}
-    </ul>
-  </div>
-  )
-}
+    <div className={s.container}>
+      <ul>
+        {actors.length > 0 ? (
+          actors.map((actor) =>
+            actor.known_for_department === 'Acting' ? (
+              <li key={actor.id}>
+                <div className={s.actor}>
+                  <img
+                    src={`${actorImgUrlBase}${actor.profile_path}`}
+                    alt={actor.name}
+                  />
+                  <div>
+                    <h2>{actor.name}</h2>
+                    <p>Character: {actor.character}</p>
+                  </div>
+                </div>
+                <hr />
+              </li>
+            ) : null
+          )
+        ) : (
+          <li>No actors found.</li>
+        )}
+      </ul>
+    </div>
+  );
+};
 
-export default MovieCast
+export default MovieCast;
+

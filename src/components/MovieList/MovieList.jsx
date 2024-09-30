@@ -1,20 +1,32 @@
-// import React from 'react'
-import { useMemo, useEffect, useState } from 'react'
-import {fetchMovies} from '/src/services/api.jsx';
-import {Link, useLocation} from 'react-router-dom'
 
-const MovieList = ({query}) => {
+import { useMemo, useEffect, useState } from 'react';
+import { fetchMovies } from '/src/services/api.jsx';
+import { Link, useLocation } from 'react-router-dom';
+import Loader from '/src/components/Loader/Loader.jsx'
+import s from '/src/components/MovieList/MovieList.module.css';
+import toast from 'react-hot-toast';
+
+const MovieList = ({ query }) => {
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const location = useLocation();
 
-    useEffect(() => {
-        const getAllMovies = async () => {
-            const data = await fetchMovies();
-            setMovies(data);
-        };
-        getAllMovies();
-    }, []);
-  
+  useEffect(() => {
+    const getAllMovies = async () => {
+      try {
+        const data = await fetchMovies();
+        setMovies(data);
+      } catch {
+        setError('Failed to fetch movies.');
+        toast.error('Failed to fetch movies.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    getAllMovies();
+  }, []);
+
   const filteredData = useMemo(() => {
     if (!query) return movies;
 
@@ -23,66 +35,34 @@ const MovieList = ({query}) => {
     );
   }, [movies, query]);
 
-  if (!filteredData || filteredData.length === 0) {
-    return <div>No movies found</div>;
+  if (loading) {
+    return <Loader />;
   }
-  
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (filteredData.length === 0) {
+    return <div className={s.error}>No movies found</div>;
+  }
+
   return (
-    <div>
-        <ul>
-             {movies.length > 0 ? ( 
-          filteredData.map(movie => (
-            <li key={movie.id}>
-              <Link to={`/movies/${movie.id}`} state={location}>{movie.title}</Link>
-            </li>
-          ))
-        ) : (
-          <li>No movies found</li>
-        )}   
-        </ul>
+    <div className={s.container}>
+      <ul className={s.list}>
+        {filteredData.map((movie) => (
+          <li key={movie.id}>
+            <Link className={s.link} to={`/movies/${movie.id}`} state={location}>
+              {movie.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
-  )
-}
+  );
+};
 
-export default MovieList
+export default MovieList;
 
 
 
-// import { useEffect, useState } from 'react'
-// import {fetchMovies} from '/src/services/api.jsx';
-// import {Link} from 'react-router-dom'
-
-// const MovieList = ({filteredData}) => {
-//     const [movies, setMovies] = useState([]);
-
-//     useEffect(() => {
-//         const getAllMovies = async () => {
-//             const data = await fetchMovies();
-//             setMovies(data);
-//         };
-//         getAllMovies();
-//     }, []);
-
-//    if (!movies) {
-//     return <div>Loading...</div>;
-//   }
-  
-    
-//   return (
-//     <div>
-//         <ul>
-//              {movies.length > 0 ? ( 
-//           filteredData.map(movie => (
-//             <li key={movie.id}>
-//               <Link to={/movies/${movie.id}}>{movie.title}</Link>
-//             </li>
-//           ))
-//         ) : (
-//           <li>No movies found</li>
-//         )}   
-//         </ul>
-//     </div>
-//   )
-// }
-
-// export default MovieList
